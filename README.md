@@ -17,7 +17,12 @@ After installing (see [Installation & Setup](#installation--setup)), you can use
 
 Clone the repo, then, you can copy the `orgsync.sh` file to your `usr/local/bin` folder to make it executable from anywhere.
 
-Create a .env file and populate each of the values
+Make a directory called `orgsync` in `~/.config`.
+
+Create a file called `config` in `orgsync`.
+
+Populate the file with the following template and replace the values surrounded in `< >` with your specific configuration values.
+
 > NOTE!
 > Both `WINDOWS_PATH` and `LINUX_PATH` refer to the path where you want your org repository to be cloned at.
 
