@@ -4,13 +4,13 @@
 
 ### VARIABLES
 
-VERSION=0.0.1
+VERSION=0.0.2
 OS=
 PARENT_PATH=
 ORG_PATH=
 
 # Load each user's org directory path from .env file.
-source ./.env
+source ~/.config/orgsync/config
 
 # Obtain operating system from the existence of a "c" mnt.
 # If there is a "c" mount, then bash is running inside of wsl. 
