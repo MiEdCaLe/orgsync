@@ -4,10 +4,12 @@
 
 ### VARIABLES
 
-VERSION=0.0.2
+VERSION=0.0.3
 OS=
 PARENT_PATH=
 ORG_PATH=
+
+SKIP=0
 
 # Load each user's org directory path from .env file.
 source ~/.config/orgsync/config
@@ -25,7 +27,7 @@ case $OS in
     WINDOWS)
 
 	# export for WSL compatibility
-	export GIT_DISCOVERY_ACROS_FILESYSTEM=1
+	export GIT_DISCOVERY_ACROSS_FILESYSTEM=1
 
 	EXTRACTED_PATH=$(echo "$WINDOWS_PATH" | sed 's/\(^[a-zA-Z]\):\/\(.*\)/\1\/\2/')
 	PARENT_PATH="/mnt/$EXTRACTED_PATH"
@@ -63,6 +65,7 @@ usage(){
     echo 
     echo '-h | --help : Displays help'
     echo '-v | --version : Display version of orgsync'
+    echo '--skip : Skip the confirmation dialogue'
     echo 
     echo 'and where <command> includes:'
     echo 
@@ -87,15 +90,37 @@ sync(){
     echo The Org directory path is :$ORG_PATH
     echo The configured git user is: $(git config user.name)
     echo The configured git email is: $(git config user.email)
-    echo Is this information correct?
-    echo '(y/n)'
 
-    local RESPONSE
-    read RESPONSE
+    if [[ $SKIP -eq 0 ]]; then
 
-    [[ $RESPONSE = '' ]] && echo "ERROR: Answer y/n" && exit 1
+	echo Is this information correct?
+	echo '(y/n)'
 
-    if [[ $RESPONSE = "y" ]]; then
+	local RESPONSE
+	read RESPONSE
+
+	[[ $RESPONSE = '' ]] && echo "ERROR: Answer y/n" && exit 1
+
+	if [[ $RESPONSE = "y" ]]; then
+
+	    # pull
+	    git pull origin master
+
+	    # add
+	    git add . 
+
+	    # commit
+	    git commit -n -m "[$(date +"%Y-%m-%d %H:%M")]"
+
+	    # push
+	    git push origin master
+
+	    echo "Successfully synced with remote" && return 0;
+	    
+	else echo "Aborting..." && exit 1;
+	fi
+
+    else
 
 	# pull
 	git pull origin master
@@ -109,9 +134,6 @@ sync(){
 	# push
 	git push origin master
 
-	echo "Successfully synced with remote" && return 0;
-	
-    else echo "Aborting..." && exit 1;
     fi
 
 }
@@ -133,6 +155,12 @@ while (( $# )); do
 	-v | --version)
 	    echo orgsync $VERSION 
 	    exit 0
+	;;
+
+	--skip)
+	    echo Skipping confirmation dialogue...
+	    SKIP=1
+	    shift 1
 	;;
 
 	sync)
